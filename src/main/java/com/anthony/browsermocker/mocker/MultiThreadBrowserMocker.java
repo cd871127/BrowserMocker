@@ -1,4 +1,4 @@
-package com.anthony.mocker;
+package com.anthony.browsermocker.mocker;
 
 /**
  * Created by chend on 2017/6/16.

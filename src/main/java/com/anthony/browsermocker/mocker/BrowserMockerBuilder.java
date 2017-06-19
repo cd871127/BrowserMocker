@@ -1,27 +1,24 @@
-package com.anthony.mocker;
+package com.anthony.browsermocker.mocker;
 
+import com.anthony.browsermocker.processor.HttpResponseProcessor;
 import org.apache.http.HttpHost;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
-
-import java.io.IOException;
 
 /**
  * Created by chend on 2017/6/16.
  */
-public abstract class BrowserMockerBuilder {
-    private HttpHost proxy = null;
+public abstract class BrowserMockerBuilder<T> {
+    HttpHost proxy = null;
     private PoolingHttpClientConnectionManager cm;
-    private int socketTimeout = 10000;
-    private int connectTimeout = 5000;
-    private CloseableHttpClient httpClient;
-    private int retryCount = 0;
+    int socketTimeout = 10000;
+    int connectTimeout = 5000;
+    CloseableHttpClient httpClient;
+    int retryCount = 0;
+    HttpResponseProcessor<T> processor;
 
     BrowserMockerBuilder() {
         cm = new PoolingHttpClientConnectionManager();
@@ -29,6 +26,16 @@ public abstract class BrowserMockerBuilder {
         cm.setDefaultMaxPerRoute(20);
         HttpHost localhost = new HttpHost("locahost", 80);
         cm.setMaxPerRoute(new HttpRoute(localhost), 50);
+    }
+
+    public BrowserMockerBuilder setProcessor(HttpResponseProcessor<T> processor) {
+        this.processor = processor;
+        return this;
+    }
+
+    public BrowserMockerBuilder setHttpClient(CloseableHttpClient httpClient) {
+        this.httpClient = httpClient;
+        return this;
     }
 
     public BrowserMockerBuilder setProxy(final String hostname, final int port, final String scheme) {

@@ -1,4 +1,4 @@
-package com.anthony.processor;
+package com.anthony.browsermocker.processor;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 
