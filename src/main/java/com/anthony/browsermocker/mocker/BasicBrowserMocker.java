@@ -11,4 +11,9 @@ public interface BasicBrowserMocker<T> {
 
     T post(URL url, Map<String, String> parameters);
 
+    T get(URL url);
+
+    T post(URL url);
+
+
 }

@@ -1,6 +1,7 @@
 package com.anthony.browsermocker.mocker;
 
 import com.anthony.browsermocker.processor.HttpResponseProcessor;
+import com.anthony.browsermocker.processor.SimpleResponseProcessor;
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.routing.HttpRoute;
@@ -26,38 +27,42 @@ public abstract class BrowserMockerBuilder<T> {
         cm.setDefaultMaxPerRoute(20);
         HttpHost localhost = new HttpHost("locahost", 80);
         cm.setMaxPerRoute(new HttpRoute(localhost), 50);
+        //获取T的真实类型
+//        Type type= this.getClass().getGenericSuperclass();
+//        Type type2 = ((ParameterizedType)type).getActualTypeArguments()[0];
+//        System.out.println(type2.getTypeName());
     }
 
-    public BrowserMockerBuilder setProcessor(HttpResponseProcessor<T> processor) {
+    public BrowserMockerBuilder<T> setProcessor(HttpResponseProcessor<T> processor) {
         this.processor = processor;
         return this;
     }
 
-    public BrowserMockerBuilder setHttpClient(CloseableHttpClient httpClient) {
+    public BrowserMockerBuilder<T> setHttpClient(CloseableHttpClient httpClient) {
         this.httpClient = httpClient;
         return this;
     }
 
-    public BrowserMockerBuilder setProxy(final String hostname, final int port, final String scheme) {
+    public BrowserMockerBuilder<T> setProxy(final String hostname, final int port, final String scheme) {
         return setProxy(hostname, port, scheme, null, null);
     }
 
-    private BrowserMockerBuilder setProxy(final String hostname, final int port, final String scheme, final String username, final String password) {
+    private BrowserMockerBuilder<T> setProxy(final String hostname, final int port, final String scheme, final String username, final String password) {
         this.proxy = new HttpHost(hostname, port, scheme);
         return this;
     }
 
-    public BrowserMockerBuilder setSocketTimeout(final int socketTimeout) {
+    public BrowserMockerBuilder<T> setSocketTimeout(final int socketTimeout) {
         this.socketTimeout = socketTimeout;
         return this;
     }
 
-    public BrowserMockerBuilder setConnectTimeout(final int connectTimeout) {
+    public BrowserMockerBuilder<T> setConnectTimeout(final int connectTimeout) {
         this.connectTimeout = connectTimeout;
         return this;
     }
 
-    public BrowserMockerBuilder setRetryCount(final int retryCount) {
+    public BrowserMockerBuilder<T> setRetryCount(final int retryCount) {
         this.retryCount = retryCount;
         return this;
     }
@@ -81,6 +86,5 @@ public abstract class BrowserMockerBuilder<T> {
         return this.httpClient;
     }
 
-
-    public abstract BasicBrowserMocker build();
+    public abstract BasicBrowserMocker<T> build();
 }
