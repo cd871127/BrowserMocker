@@ -49,6 +49,7 @@ public class SimpleBrowserMocker<T> extends AbstractBrowserMocker<T> {
         return execute(httpGet);
     }
 
+
     @Override
     public T get(URL url) {
         return get(url, null);
@@ -78,39 +79,6 @@ public class SimpleBrowserMocker<T> extends AbstractBrowserMocker<T> {
         public SimpleBrowserMocker<T> build() {
             return new SimpleBrowserMocker<>(getHttpClient(), this.processor);
         }
-//
-//    public SimpleBrowserMockerBuilder<k> setProcessor(HttpResponseProcessor<k> processor) {
-//        this.processor = processor;
-//        return this;
-//    }
-//
-//    public SimpleBrowserMockerBuilder<k> setHttpClient(CloseableHttpClient httpClient) {
-//        this.httpClient = httpClient;
-//        return this;
-//    }
-//
-//    public SimpleBrowserMockerBuilder<k> setProxy(final String hostname, final int port, final String scheme) {
-//        return setProxy(hostname, port, scheme, null, null);
-//    }
-//
-//    private SimpleBrowserMockerBuilder<k> setProxy(final String hostname, final int port, final String scheme, final String username, final String password) {
-//        this.proxy = new HttpHost(hostname, port, scheme);
-//        return this;
-//    }
-//
-//    public SimpleBrowserMockerBuilder<k> setSocketTimeout(final int socketTimeout) {
-//        this.socketTimeout = socketTimeout;
-//        return this;
-//    }
-//
-//    public SimpleBrowserMockerBuilder<k> setConnectTimeout(final int connectTimeout) {
-//        this.connectTimeout = connectTimeout;
-//        return this;
-//    }
-//
-//    public SimpleBrowserMockerBuilder<k> setRetryCount(final int retryCount) {
-//        this.retryCount = retryCount;
-//        return this;
-//    }
+
     }
 }

@@ -10,6 +10,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,5 +55,6 @@ public abstract class AbstractBrowserMocker<T> implements BasicBrowserMocker<T>{
         parameters.forEach((k, v) -> list.add(new BasicNameValuePair(k, v)));
         return list;
     }
+
 
 }
