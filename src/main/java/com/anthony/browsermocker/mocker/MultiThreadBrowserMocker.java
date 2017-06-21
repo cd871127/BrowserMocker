@@ -8,8 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by chend on 2017/6/16.
@@ -22,28 +25,27 @@ public class MultiThreadBrowserMocker<T> extends SimpleBrowserMocker<T> {
 
     private MockerThread<T> mockerThread;
 
+    private int threadCount = 1;
 
-    MultiThreadBrowserMocker() {
-    }
 
-    MultiThreadBrowserMocker(CloseableHttpClient httpClient) {
-        super(httpClient);
-    }
-
-    MultiThreadBrowserMocker(CloseableHttpClient httpClient, HttpResponseProcessor<T> processor) {
+    MultiThreadBrowserMocker(CloseableHttpClient httpClient, HttpResponseProcessor<T> processor, int threadCount) {
         super(httpClient, processor);
+        this.threadCount = threadCount;
     }
 
-    @Override
-    public T get(URL url) {
-        MockerThread<T> mockerThread = new MockerThread<>(new HttpGet(url.toString()));
-        T res = null;
-        try {
-            res = mockerThread.call();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+    public T get(ArrayList<URL> urlList) {
+        es = Executors.newFixedThreadPool(threadCount);
+        ArrayList<HttpRequestBase> taskList = new ArrayList<>();
+//        taskList.add(urlList.forEach((k)->new HttpGet(k.toString())));
+        for (URL url : urlList) {
+            taskList.add(new HttpGet(url.toString()));
         }
-        return res;
+        MockerThread<String> thread = new MockerThread<>(taskList);
+        es.submit(thread);
+        es.shutdown();
+
+        return null;
     }
 
     public static <T> MultiThreadBrowserMockerBuilder<T> builder() {
@@ -51,23 +53,35 @@ public class MultiThreadBrowserMocker<T> extends SimpleBrowserMocker<T> {
     }
 
     public static class MultiThreadBrowserMockerBuilder<K> extends SimpleBrowserMockerBuilder<K> {
+        private int threadCount = 1;
+
         @Override
         public MultiThreadBrowserMocker<K> build() {
-            return new MultiThreadBrowserMocker<>(getHttpClient(), this.processor);
+            return new MultiThreadBrowserMocker<>(getHttpClient(), this.processor, threadCount);
+        }
+
+        public BrowserMockerBuilder<K> setThreadCount(int threadCount) {
+            this.threadCount = threadCount;
+            return this;
         }
     }
 
     private class MockerThread<V> extends SimpleBrowserMocker<V> implements Callable<V> {
 
-        private HttpRequestBase httpRequestBase;
+        private LinkedBlockingQueue<HttpRequestBase> taskList;
 
-        public MockerThread(HttpRequestBase httpRequestBase) {
-            this.httpRequestBase = httpRequestBase;
+        public MockerThread(ArrayList<HttpRequestBase> taskList) {
+            this.taskList = new LinkedBlockingQueue<>(taskList);
         }
 
         @Override
         public V call() throws Exception {
-            return execute(httpRequestBase);
+            HttpRequestBase task;
+            while ((task = taskList.poll()) != null) {
+                System.out.println(execute(task));
+            }
+            return null;
+//            return execute(httpRequestBase);
         }
     }
 
