@@ -7,6 +7,7 @@ import java.util.Map;
  * Created by chend on 2017/6/16.
  */
 public interface BasicBrowserMocker<T> {
+
     T get(URL url, Map<String, String> parameters);
 
     T post(URL url, Map<String, String> parameters);
@@ -14,6 +15,5 @@ public interface BasicBrowserMocker<T> {
     T get(URL url);
 
     T post(URL url);
-
 
 }

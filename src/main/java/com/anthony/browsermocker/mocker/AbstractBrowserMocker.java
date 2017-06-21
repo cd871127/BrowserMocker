@@ -10,7 +10,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,7 @@ import java.util.Map;
 /**
  * Created by chend on 2017/6/19.
  */
-public abstract class AbstractBrowserMocker<T> implements BasicBrowserMocker<T>{
+public abstract class AbstractBrowserMocker<T> implements BasicBrowserMocker<T> {
     protected CloseableHttpClient httpClient;
     protected HttpResponseProcessor<T> processor;
 
@@ -37,10 +36,10 @@ public abstract class AbstractBrowserMocker<T> implements BasicBrowserMocker<T>{
     protected T execute(HttpRequestBase httpRequestBase) {
         HttpContext context = HttpClientContext.create();
         CloseableHttpResponse response;
-        T result=null;
+        T result = null;
         try {
             response = httpClient.execute(httpRequestBase, context);
-            result=processor.process(response);
+            result = processor.process(response);
             response.close();
         } catch (IOException e) {
             e.printStackTrace();

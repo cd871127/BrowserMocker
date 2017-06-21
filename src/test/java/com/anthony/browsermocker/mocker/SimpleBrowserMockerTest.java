@@ -14,9 +14,9 @@ public class SimpleBrowserMockerTest {
     public void t() throws MalformedURLException {
 
 
-        MultiThreadBrowserMocker<String> s= (MultiThreadBrowserMocker<String>) MultiThreadBrowserMocker.<String>builder().setProcessor(new SimpleResponseProcessor()).build();
-        String ss=null;
-        for(int i=0;i!=10;++i) {
+        MultiThreadBrowserMocker<String> s = (MultiThreadBrowserMocker<String>) MultiThreadBrowserMocker.<String>builder().setProcessor(new SimpleResponseProcessor()).build();
+        String ss = null;
+        for (int i = 0; i != 10; ++i) {
             ss = s.get(new URL("http://www.baidu.com"));
         }
         System.out.println(ss);

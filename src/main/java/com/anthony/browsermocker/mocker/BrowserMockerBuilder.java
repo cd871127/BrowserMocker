@@ -1,7 +1,6 @@
 package com.anthony.browsermocker.mocker;
 
 import com.anthony.browsermocker.processor.HttpResponseProcessor;
-import com.anthony.browsermocker.processor.SimpleResponseProcessor;
 import org.apache.http.HttpHost;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.conn.routing.HttpRoute;

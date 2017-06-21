@@ -19,7 +19,7 @@ public class SimpleResponseProcessor implements HttpResponseProcessor<String> {
             BufferedReader br = new BufferedReader(new InputStreamReader(in));
             String tmp;
             while ((tmp = br.readLine()) != null) {
-                stringBuilder.append(tmp+"\n");
+                stringBuilder.append(tmp + "\n");
             }
         } catch (IOException e) {
             e.printStackTrace();
