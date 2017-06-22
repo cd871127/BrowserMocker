@@ -26,10 +26,6 @@ public abstract class BrowserMockerBuilder<T> {
         cm.setDefaultMaxPerRoute(20);
         HttpHost localhost = new HttpHost("locahost", 80);
         cm.setMaxPerRoute(new HttpRoute(localhost), 50);
-        //获取T的真实类型
-//        Type type= this.getClass().getGenericSuperclass();
-//        Type type2 = ((ParameterizedType)type).getActualTypeArguments()[0];
-//        System.out.println(type2.getTypeName());
     }
 
     public BrowserMockerBuilder<T> setProcessor(HttpResponseProcessor<T> processor) {
