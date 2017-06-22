@@ -35,8 +35,7 @@ public class SimpleBrowserMocker<T> extends AbstractBrowserMocker<T> {
         super(httpClient, processor);
     }
 
-    @Override
-    public T get(URL url, Map<String, String> parameters) {
+    protected HttpGet createHttpGet(URL url, Map<String, String> parameters) {
         List<NameValuePair> paramList = parameterMapToList(parameters);
         String paramStr = "";
         try {
@@ -45,8 +44,12 @@ public class SimpleBrowserMocker<T> extends AbstractBrowserMocker<T> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        HttpGet httpGet = new HttpGet(url.toString() + paramStr);
-        return execute(httpGet);
+        return new HttpGet(url.toString() + paramStr);
+    }
+
+    @Override
+    public T get(URL url, Map<String, String> parameters) {
+        return execute(createHttpGet(url, parameters));
     }
 
 
@@ -55,14 +58,17 @@ public class SimpleBrowserMocker<T> extends AbstractBrowserMocker<T> {
         return get(url, null);
     }
 
-    @Override
-    public T post(URL url, Map<String, String> parameters) {
+    protected HttpPost createHttpPost(URL url, Map<String, String> parameters) {
         HttpPost httpPost = new HttpPost(url.toString());
         List<NameValuePair> paramList = parameterMapToList(parameters);
         if (null != paramList)
             httpPost.setEntity(new UrlEncodedFormEntity(paramList, Consts.UTF_8));
-        execute(httpPost);
-        return null;
+        return httpPost;
+    }
+
+    @Override
+    public T post(URL url, Map<String, String> parameters) {
+        return execute(createHttpPost(url, parameters));
     }
 
     @Override

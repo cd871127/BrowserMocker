@@ -1,7 +1,6 @@
 package com.anthony.browsermocker.mocker;
 
 import com.anthony.browsermocker.processor.HttpResponseProcessor;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
@@ -32,12 +31,34 @@ public class MultiThreadBrowserMocker<T> extends SimpleBrowserMocker<T> {
     }
 
     public Map<String, T> get(Map<String, URL> urls) {
+        return get(urls, null);
+    }
+
+    public Map<String, T> get(Map<String, URL> urls, Map<String, Map<String, String>> param) {
+        Map<String, HttpRequestBase> taskMap = new HashMap<>();
+        for (String key : urls.keySet()) {
+            URL url = urls.get(key);
+            Map urlParam = param == null ? null : param.get(key);
+            taskMap.put(key, createHttpGet(url, urlParam));
+        }
+        return start(taskMap);
+    }
+
+    public Map<String, T> post(Map<String, URL> urls) {
+        return post(urls, null);
+    }
+
+    public Map<String, T> post(Map<String, URL> urls, Map<String, Map<String, String>> param) {
+        Map<String, HttpRequestBase> taskMap = new HashMap<>();
+        for (String key : urls.keySet()) {
+            taskMap.put(key, createHttpPost(urls.get(key), param.get(key)));
+        }
+        return start(taskMap);
+    }
+
+    private Map<String, T> start(Map<String, HttpRequestBase> taskMap) {
         es = Executors.newFixedThreadPool(threadCount);
 
-        Map<String, HttpRequestBase> taskMap = new HashMap<>();
-        for (Map.Entry<String, URL> e : urls.entrySet()) {
-            taskMap.put(e.getKey(), new HttpGet(e.getValue().toString()));
-        }
         MockerThread mockerThread = new MockerThread(taskMap);
         Future[] futures = new Future[threadCount];
 
