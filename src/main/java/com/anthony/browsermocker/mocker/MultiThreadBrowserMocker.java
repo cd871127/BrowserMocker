@@ -8,10 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.concurrent.Callable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -23,29 +24,39 @@ public class MultiThreadBrowserMocker<T> extends SimpleBrowserMocker<T> {
 
     private ExecutorService es;
 
-    private MockerThread<T> mockerThread;
-
     private int threadCount = 1;
-
 
     MultiThreadBrowserMocker(CloseableHttpClient httpClient, HttpResponseProcessor<T> processor, int threadCount) {
         super(httpClient, processor);
         this.threadCount = threadCount;
     }
 
-
-    public T get(ArrayList<URL> urlList) {
+    public Map<String, T> get(Map<String, URL> urls) {
         es = Executors.newFixedThreadPool(threadCount);
-        ArrayList<HttpRequestBase> taskList = new ArrayList<>();
-//        taskList.add(urlList.forEach((k)->new HttpGet(k.toString())));
-        for (URL url : urlList) {
-            taskList.add(new HttpGet(url.toString()));
+
+        Map<String, HttpRequestBase> taskMap = new HashMap<>();
+        for (Map.Entry<String, URL> e : urls.entrySet()) {
+            taskMap.put(e.getKey(), new HttpGet(e.getValue().toString()));
         }
-        MockerThread<String> thread = new MockerThread<>(taskList);
-        es.submit(thread);
+        MockerThread mockerThread = new MockerThread(taskMap);
+        Future[] futures = new Future[threadCount];
+
+        for (int i = 0; i != threadCount; ++i)
+            futures[i] = es.submit(mockerThread);
         es.shutdown();
 
-        return null;
+        while (!es.isTerminated()) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        Map<String, T> resMap = new HashMap<>();
+        for (Map.Entry<String, T> e : mockerThread.getResList()) {
+            resMap.put(e.getKey(), e.getValue());
+        }
+        return resMap;
     }
 
     public static <T> MultiThreadBrowserMockerBuilder<T> builder() {
@@ -66,22 +77,30 @@ public class MultiThreadBrowserMocker<T> extends SimpleBrowserMocker<T> {
         }
     }
 
-    private class MockerThread<V> extends SimpleBrowserMocker<V> implements Callable<V> {
+    private class MockerThread implements Runnable {
 
-        private LinkedBlockingQueue<HttpRequestBase> taskList;
+        private LinkedBlockingQueue<Map.Entry<String, HttpRequestBase>> taskList;
 
-        public MockerThread(ArrayList<HttpRequestBase> taskList) {
-            this.taskList = new LinkedBlockingQueue<>(taskList);
+        private LinkedBlockingQueue<Map.Entry<String, T>> resList;
+
+        public MockerThread(Map<String, HttpRequestBase> taskMap) {
+            this.resList = new LinkedBlockingQueue<>();
+            this.taskList = new LinkedBlockingQueue<>();
+            this.taskList.addAll(taskMap.entrySet());
+        }
+
+        public LinkedBlockingQueue<Map.Entry<String, T>> getResList() {
+            return resList;
         }
 
         @Override
-        public V call() throws Exception {
-            HttpRequestBase task;
+        public void run() {
+            Map.Entry<String, HttpRequestBase> task;
+            Map<String, T> resMap = new HashMap<>();
             while ((task = taskList.poll()) != null) {
-                System.out.println(execute(task));
+                resMap.put(task.getKey(), execute(task.getValue()));
             }
-            return null;
-//            return execute(httpRequestBase);
+            resList.addAll(resMap.entrySet());
         }
     }
 
