@@ -39,8 +39,10 @@ public class SimpleBrowserMocker<T> extends AbstractBrowserMocker<T> {
         List<NameValuePair> paramList = parameterMapToList(parameters);
         String paramStr = "";
         try {
-            if (null != paramList)
+            if (null != paramList) {
                 paramStr = EntityUtils.toString(new UrlEncodedFormEntity(paramList, Consts.UTF_8));
+                paramStr="?"+paramStr;
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
