@@ -8,6 +8,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
+import java.util.Map;
+
 /**
  * Created by chend on 2017/6/16.
  */
@@ -19,6 +21,7 @@ public abstract class BrowserMockerBuilder<T> {
     CloseableHttpClient httpClient;
     int retryCount = 0;
     HttpResponseProcessor<T> processor;
+    Map<String,String> headers;
 
     BrowserMockerBuilder() {
         cm = new PoolingHttpClientConnectionManager();
@@ -26,6 +29,11 @@ public abstract class BrowserMockerBuilder<T> {
         cm.setDefaultMaxPerRoute(20);
         HttpHost localhost = new HttpHost("locahost", 80);
         cm.setMaxPerRoute(new HttpRoute(localhost), 50);
+    }
+
+    public BrowserMockerBuilder<T> setHeaders(Map<String,String> headers) {
+        this.headers = headers;
+        return this;
     }
 
     public BrowserMockerBuilder<T> setProcessor(HttpResponseProcessor<T> processor) {

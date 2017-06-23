@@ -31,8 +31,8 @@ public class SimpleBrowserMocker<T> extends AbstractBrowserMocker<T> {
         super(httpClient);
     }
 
-    SimpleBrowserMocker(CloseableHttpClient httpClient, HttpResponseProcessor<T> processor) {
-        super(httpClient, processor);
+    SimpleBrowserMocker(CloseableHttpClient httpClient, HttpResponseProcessor<T> processor,Map<String,String> headers) {
+        super(httpClient, processor,headers);
     }
 
     protected HttpGet createHttpGet(URL url, Map<String, String> parameters) {
@@ -85,7 +85,7 @@ public class SimpleBrowserMocker<T> extends AbstractBrowserMocker<T> {
     public static class SimpleBrowserMockerBuilder<T> extends BrowserMockerBuilder<T> {
 
         public SimpleBrowserMocker<T> build() {
-            return new SimpleBrowserMocker<>(getHttpClient(), this.processor);
+            return new SimpleBrowserMocker<>(getHttpClient(), this.processor,this.headers);
         }
 
     }

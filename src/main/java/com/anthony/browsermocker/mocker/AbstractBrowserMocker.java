@@ -3,6 +3,8 @@ package com.anthony.browsermocker.mocker;
 import com.anthony.browsermocker.processor.HttpResponseProcessor;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -11,6 +13,7 @@ import org.apache.http.protocol.HttpContext;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +23,7 @@ import java.util.Map;
 public abstract class AbstractBrowserMocker<T> implements BasicBrowserMocker<T> {
     protected CloseableHttpClient httpClient;
     protected HttpResponseProcessor<T> processor;
+    protected Map<String,String> headers=null;
 
     protected AbstractBrowserMocker() {
     }
@@ -28,9 +32,10 @@ public abstract class AbstractBrowserMocker<T> implements BasicBrowserMocker<T> 
         this.httpClient = httpClient;
     }
 
-    protected AbstractBrowserMocker(CloseableHttpClient httpClient, HttpResponseProcessor<T> processor) {
+    protected AbstractBrowserMocker(CloseableHttpClient httpClient, HttpResponseProcessor<T> processor,Map<String,String> headers) {
         this.httpClient = httpClient;
         this.processor = processor;
+        this.headers = headers;
     }
 
     protected T execute(HttpRequestBase httpRequestBase) {
@@ -39,7 +44,13 @@ public abstract class AbstractBrowserMocker<T> implements BasicBrowserMocker<T> 
         T result = null;
         try {
             response = httpClient.execute(httpRequestBase, context);
-            result = processor.process(response);
+            Map<String, Object> param = new HashMap<>();
+            param.put("httpRequestBase", httpRequestBase);
+            if (httpRequestBase instanceof HttpPost)
+                param.put("method", "post");
+            else if (httpRequestBase instanceof HttpGet)
+                param.put("method", "get");
+            result = processor.process(response, param);
             response.close();
         } catch (IOException e) {
             e.printStackTrace();

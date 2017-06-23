@@ -25,8 +25,8 @@ public class MultiThreadBrowserMocker<T> extends SimpleBrowserMocker<T> {
 
     private int threadCount = 1;
 
-    MultiThreadBrowserMocker(CloseableHttpClient httpClient, HttpResponseProcessor<T> processor, int threadCount) {
-        super(httpClient, processor);
+    MultiThreadBrowserMocker(CloseableHttpClient httpClient, HttpResponseProcessor<T> processor,Map<String,String> headers, int threadCount) {
+        super(httpClient, processor,headers);
         this.threadCount = threadCount;
     }
 
@@ -89,7 +89,7 @@ public class MultiThreadBrowserMocker<T> extends SimpleBrowserMocker<T> {
 
         @Override
         public MultiThreadBrowserMocker<K> build() {
-            return new MultiThreadBrowserMocker<>(getHttpClient(), this.processor, threadCount);
+            return new MultiThreadBrowserMocker<>(getHttpClient(), this.processor,this.headers, threadCount);
         }
 
         public BrowserMockerBuilder<K> setThreadCount(int threadCount) {
