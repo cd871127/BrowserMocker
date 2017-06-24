@@ -21,7 +21,7 @@ public abstract class BrowserMockerBuilder<T> {
     CloseableHttpClient httpClient;
     int retryCount = 0;
     HttpResponseProcessor<T> processor;
-    Map<String,String> headers;
+    Map<String, String> headers;
 
     BrowserMockerBuilder() {
         cm = new PoolingHttpClientConnectionManager();
@@ -31,7 +31,7 @@ public abstract class BrowserMockerBuilder<T> {
         cm.setMaxPerRoute(new HttpRoute(localhost), 50);
     }
 
-    public BrowserMockerBuilder<T> setHeaders(Map<String,String> headers) {
+    public BrowserMockerBuilder<T> setHeaders(Map<String, String> headers) {
         this.headers = headers;
         return this;
     }
@@ -78,7 +78,7 @@ public abstract class BrowserMockerBuilder<T> {
             this.httpClient = HttpClients.custom()
                     .setConnectionManager(this.cm)
                     .setDefaultRequestConfig(requestConfig)
-                    .setRetryHandler((exception, executionCount, context) -> executionCount <= this.retryCount)
+                    .setRetryHandler((exception, executionCount, context) -> executionCount < this.retryCount)
                     .build();
         } else {
             this.httpClient = HttpClients.custom()

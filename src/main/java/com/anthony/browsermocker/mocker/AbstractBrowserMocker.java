@@ -10,8 +10,11 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +24,7 @@ import java.util.Map;
  * Created by chend on 2017/6/19.
  */
 public abstract class AbstractBrowserMocker<T> implements BasicBrowserMocker<T> {
+    private Logger logger= LoggerFactory.getLogger(getClass());
     protected CloseableHttpClient httpClient;
     protected HttpResponseProcessor<T> processor;
     protected Map<String,String> headers=null;
@@ -53,7 +57,10 @@ public abstract class AbstractBrowserMocker<T> implements BasicBrowserMocker<T> 
             result = processor.process(response, param);
             response.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            if(e instanceof SocketTimeoutException)
+                logger.warn(httpRequestBase.getURI().toString() +" time out");
+            else
+                e.printStackTrace();
         }
         return result;
     }
